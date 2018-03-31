@@ -45,12 +45,31 @@ def read_data(filename):
     with zipfile.ZipFile(filename) as f:
         data = tf.compat.as_str(f.read(f.namelist()[0])).split()
     return data
+    
+def get_exluded_words():
+    
+    words = []
+    with open('excluded_words.txt') as e:
+        words = e.read().splitlines()
+    
+    return words
 
+def exclude_list(words):
+
+    excluded_words = get_exluded_words()
+    newList = []
+
+    for word in words:
+        if word not in excluded_words:
+            newList.append(word)
+
+    return newList
 # 
 def build_dataset(words, n_words):
     """Process raw inputs into a dataset."""
     count = [['UNK', -1]]
-    count.extend(collections.Counter(words).most_common(n_words - 1))
+    #count.extend(collections.Counter(words).most_common(n_words - 1))
+    count.extend(collections.Counter(exclude_list(words)).most_common(n_words - 1))    
     dictionary = dict()
     for word, _ in count:
         dictionary[word] = len(dictionary)
